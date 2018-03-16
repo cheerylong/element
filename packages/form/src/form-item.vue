@@ -227,6 +227,8 @@
            这里需要强行触发一次，刷新 validateDisabled 的值，
            确保 Select 下一次值改变时能正确触发校验 */
         this.broadcast('ElSelect', 'fieldReset');
+
+        this.broadcast('ElTimeSelect', 'fieldReset', this.initialValue);
       },
       getRules() {
         let formRules = this.form.rules;
@@ -241,7 +243,12 @@
         const rules = this.getRules();
 
         return rules.filter(rule => {
-          return !rule.trigger || rule.trigger.indexOf(trigger) !== -1;
+          if (!rule.trigger || trigger === '') return true;
+          if (Array.isArray(rule.trigger)) {
+            return rule.trigger.indexOf(trigger) > -1;
+          } else {
+            return rule.trigger === trigger;
+          }
         }).map(rule => objectAssign({}, rule));
       },
       onFieldBlur() {
